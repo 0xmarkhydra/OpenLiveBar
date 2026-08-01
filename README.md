@@ -1,72 +1,79 @@
 # OpenLiveBar
 
-Open-source, platform-agnostic interactive bar engine for livestream creators.
-Viewers become virtual guests and trigger in-game actions through chat,
-reactions, gifts, follows, shares, and subscriptions.
+An open-source, API-controlled virtual bar for livestream creators.
+
+OpenLiveBar renders a vertical 9:16 nightclub that can be used as an OBS Browser
+Source. Any third-party service can call the HTTP API to add guests, focus a
+camera, send gifts, promote VIPs, display messages, or run stage effects.
+
+The MVP deliberately does **not** connect to social networks. TikTok, YouTube,
+Facebook, X, custom bots, and future providers all sit outside the game and call
+the same provider-neutral API.
 
 > OpenLiveBar is not affiliated with TikTok, YouTube, Facebook, X, or their parent companies.
 
-## Why platform-agnostic?
+## Features
 
-The game never consumes provider payloads directly. Every integration implements
-the `PlatformAdapter` contract and converts native events into the versioned
-`LiveEvent` protocol. The same game rules therefore work across platforms.
+- Responsive vertical 9:16 virtual bar
+- Animated guests with display names and optional avatars
+- Dance floor, tables, DJ stage, lights and VIP lounge
+- Camera spotlight, fireworks, confetti and smoke effects
+- Provider-neutral HTTP event API
+- Cursor polling: no WebSocket or SSE
+- Idempotent event IDs for safe third-party retries
+- Optional Bearer API key for writes
+- In-memory event history capped per room
 
-```text
-TikTok  ─┐
-YouTube ─┼─> Platform adapters ─> LiveEvent protocol ─> Rules ─> Game/OBS
-Facebook─┤
-X       ─┘
-```
-
-## Current status
-
-This repository contains the initial foundation:
-
-- Versioned cross-platform live-event protocol
-- Public adapter SDK and registry
-- Capability discovery per platform
-- Working mock adapter and event simulator
-- Placeholders for TikTok, YouTube, Facebook, and X
-- Minimal health API
-
-Platform placeholders intentionally do not pretend unsupported APIs exist.
-Availability differs by platform, account type, region, and API approval.
-
-## Quick start
+## Start
 
 ```bash
 npm install
-npm run check
-npm run dev:server
+npm run build
+npm test
+npm start --workspace @openlivebar/server
 ```
 
-Try the simulator:
+Open the room:
+
+```text
+http://localhost:8787/bar/demo
+```
+
+Send a guest into the bar:
 
 ```bash
-curl http://localhost:8787/health
-curl http://localhost:8787/simulate/join
-curl http://localhost:8787/simulate/chat
-curl http://localhost:8787/simulate/gift
+curl -X POST http://localhost:8787/api/v1/rooms/demo/events \
+  -H 'content-type: application/json' \
+  -d '{"type":"guest.joined","user":{"id":"u1","name":"Mr. MMON"}}'
 ```
 
-## Add a platform
+Send a Rose:
 
-1. Implement `PlatformAdapter` from `@openlivebar/platform-sdk`.
-2. Keep API credentials inside the adapter/server environment.
-3. Normalize native payloads to `LiveEvent`.
-4. Declare only capabilities the integration actually supports.
-5. Add contract tests using recorded, anonymized fixtures.
+```bash
+curl -X POST http://localhost:8787/api/v1/rooms/demo/events \
+  -H 'content-type: application/json' \
+  -d '{"type":"gift.received","user":{"id":"u1","name":"Mr. MMON"},"data":{"giftName":"Rose","count":1}}'
+```
 
-See [docs/architecture.md](docs/architecture.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
+Read the complete [HTTP API documentation](docs/API.md).
 
-## Roadmap
+## Configuration
 
-- Phase 1: protocol, simulator, TikTok adapter, realtime gateway
-- Phase 2: 2D bar game, rules engine, OBS overlay, admin dashboard
-- Phase 3: YouTube adapter and durable sessions/leaderboards
-- Phase 4: Facebook and X adapters where supported by official APIs
-- Phase 5: plugin marketplace and multi-room hosting
+| Variable | Default | Purpose |
+|---|---|---|
+| `PORT` | `8787` | HTTP server port |
+| `OPENLIVEBAR_API_KEY` | unset | Optional Bearer key for write APIs |
+
+## Architecture
+
+```text
+Third-party event reader ──POST HTTP──> OpenLiveBar API
+                                            │
+OBS Browser Source <────HTTP cursor polling─┘
+```
+
+Future social adapters can live in separate packages. They must call the public
+HTTP API instead of being imported into the visual bar.
 
 ## License
 
