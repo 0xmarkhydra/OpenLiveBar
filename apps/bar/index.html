@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+    <title>OpenLiveBar</title>
+    <link rel="stylesheet" href="/bar-assets/styles.css" />
+  </head>
+  <body>
+    <main class="bar" id="bar">
+      <div class="ambient"></div>
+      <header class="header">
+        <div><span class="live-dot"></span> OPEN LIVE BAR</div>
+        <span id="roomLabel">#demo</span>
+      </header>
+
+      <section class="vip-deck">
+        <div class="vip-sign">VIP LOUNGE</div>
+        <div class="vip-seats" id="vipSeats"></div>
+      </section>
+
+      <section class="stage">
+        <div class="light light-a"></div><div class="light light-b"></div>
+        <div class="screen"><small>WELCOME TO</small><strong>OPEN<br />LIVE BAR</strong></div>
+        <div class="dj"><span>DJ</span><i></i><i></i></div>
+        <div class="speaker left"><i></i><i></i></div>
+        <div class="speaker right"><i></i><i></i></div>
+      </section>
+
+      <section class="dance-floor" id="danceFloor">
+        <div class="floor-grid"></div>
+        <div class="table table-a"><span></span></div>
+        <div class="table table-b"><span></span></div>
+        <div class="table table-c"><span></span></div>
+        <div class="guests" id="guests"></div>
+        <div class="spotlight" id="spotlight"></div>
+      </section>
+
+      <div class="effects" id="effects"></div>
+      <div class="toast" id="toast">Call the API to start the party</div>
+
+      <footer class="footer">
+        <div><strong id="guestCount">0</strong><span>GUESTS</span></div>
+        <div class="equalizer"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div><strong>API</strong><span>CONTROLLED</span></div>
+      </footer>
+    </main>
+    <script type="module" src="/bar-assets/bar.js"></script>
+  </body>
+</html>
